@@ -1,0 +1,156 @@
+const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('Create Calendar Events')
+      .addItem('Edit Project Schedule', 'editProjectSchedule')
+      .addSeparator()
+      .addItem("Shoot Details", "shootDetails")
+      .addToUi();
+}
+
+
+function editProjectSchedule() {
+  let sheet = ss.getSheetByName("Edit Project Schedule");
+  let edit_datesId = ss.getRangeByName("edit_dates_calendar_id").getValue();  
+  let shipping_datesId = ss.getRangeByName("ship_dates_calendar_id").getValue();
+  let live_datesId = ss.getRangeByName("live_dates_calendar_id").getValue();
+  let edit_dates = CalendarApp.getCalendarById(edit_datesId);
+  let shipping_dates = CalendarApp.getCalendarById(shipping_datesId);
+  let live_dates = CalendarApp.getCalendarById(live_datesId);
+  let lr = sheet.getLastRow()+1;
+  for(let i=2; i<lr; i++){
+    // Creating events in Edit Dates Calendar
+    {
+      let eventTitle = sheet.getRange(i,1).getValue() + " " + sheet.getRange(i,4).getValue();
+      let currentYear = new Date().getFullYear();
+      let date = sheet.getRange(i,5).getValue();
+      if(date.toString().indexOf(" - ")!=-1 && date != "" && date != "N/A" && date!="?"){
+        let startDate = date.toString().split(" - ")[0].trim();
+        startDate = new Date(new Date(startDate).setFullYear(currentYear));
+        let endDate = date.toString().split(" - ")[1].trim();
+        endDate = endDate.split("?")[0].trim();
+        endDate=endDate.split("\n")[0].trim();
+        if(endDate!=""){
+          endDate = new Date(new Date(endDate).setFullYear(currentYear));
+          endDate = new Date(new Date(endDate).setHours(23,59)).getTime() + (24*60*60*1000);
+          endDate = new Date(endDate);
+          edit_dates.createAllDayEvent(eventTitle,startDate,endDate);
+        }
+        else{
+          edit_dates.createAllDayEvent(eventTitle,startDate);
+        }
+      }
+      else if(date.toString().indexOf("- ")!=-1 && date != "" && date != "N/A" && date!="?"){
+        let eventDate = date.toString().split("- ")[1].trim();
+        eventDate = new Date(new Date(eventDate).setFullYear(currentYear));
+        edit_dates.createAllDayEvent(eventTitle,eventDate);
+      }
+      else if(date != "" && date != "N/A" && date!="?"){
+        date = date.toString().split("?")[0].trim();
+        date = new Date(new Date(date).setFullYear(currentYear));
+        edit_dates.createAllDayEvent(eventTitle,date);        
+      }
+    }
+    // Creating events in Shipping Dates Calendar
+    {
+      let eventTitle = sheet.getRange(i,1).getValue();
+      let currentYear = new Date().getFullYear();
+      let date = sheet.getRange(i,9).getValue();
+      if(date.toString().indexOf(" - ")!=-1 && date != "" && date != "N/A" && date!="?"){
+        let startDate = date.toString().split(" - ")[0].trim();
+        let endDate = date.toString().split(" - ")[1].trim();
+        startDate = new Date(new Date(startDate).setFullYear(currentYear));
+        endDate = endDate.split("?")[0].trim();
+        endDate=endDate.split("\n")[0].trim();
+        if(endDate[1]!=""){
+          endDate = new Date(new Date(endDate).setFullYear(currentYear));
+          endDate = new Date(new Date(endDate).setHours(23,59)).getTime() + (24*60*60*1000);
+          endDate = new Date(endDate);
+          shipping_dates.createAllDayEvent(eventTitle,startDate,endDate);
+        }
+        else{
+          shipping_dates.createAllDayEvent(eventTitle,startDate);
+        }
+      }
+      else if(date.toString().indexOf("- ")!=-1 && date != "" && date != "N/A" && date!="?"){
+        let eventDate = date.toString().split("- ")[1].trim();
+        eventDate = new Date(new Date(eventDate).setFullYear(currentYear));
+        shipping_dates.createAllDayEvent(eventTitle,eventDate);
+      }
+      else if(date != "" && date != "N/A" && date!="?"){
+        date = date.toString().split("?")[0].trim();
+        date = new Date(new Date(date).setFullYear(currentYear));
+        shipping_dates.createAllDayEvent(eventTitle,date);
+      }
+    }
+    // Creating events in Live Dates Calendar
+    {
+      let eventTitle = sheet.getRange(i,1).getValue() + " " + sheet.getRange(i,4).getValue();
+      let currentYear = new Date().getFullYear();
+      let date = sheet.getRange(i,11).getValue();
+      if(date.toString().indexOf(" - ")!=-1 && date != "" && date != "N/A" && date!="?"){
+        let startDate = date.toString().split(" - ")[0].trim();
+        var endDate = date.toString().split(" - ")[1].trim();
+        startDate = new Date(new Date(startDate).setFullYear(currentYear));
+        endDate = endDate.split("?")[0].trim();
+        endDate=endDate.split("\n")[0].trim();   
+        if(endDate!=""){
+          endDate = new Date(new Date(endDate).setFullYear(currentYear));
+          endDate = new Date(new Date(endDate).setHours(23,59)).getTime() + (24*60*60*1000);
+          endDate = new Date(endDate);
+          live_dates.createAllDayEvent(eventTitle,startDate,endDate);
+        }
+        else{
+          live_dates.createAllDayEvent(eventTitle,startDate);
+        }
+      }
+      else if(date.toString().indexOf("- ")!=-1 && date != "" && date != "N/A" && date!="?"){
+        let eventDate = date.toString().split("- ")[1].trim();
+        eventDate = new Date(new Date(eventDate).setFullYear(currentYear));
+        live_dates.createAllDayEvent(eventTitle,eventDate);
+      }
+      else if(date != "" && date != "N/A" && date!="?"){
+        date = date.toString().split("?")[0].trim();
+        date = new Date(new Date(date).setFullYear(currentYear));
+        live_dates.createAllDayEvent(eventTitle,date);
+      }
+    }
+    
+    Utilities.sleep(200);
+  }
+}
+
+function shootDetails(){
+  let sheet = ss.getSheetByName("Shoot Details");
+  let calId = ss.getRangeByName("shoot_details_calendar_id").getValue();
+  let calender = CalendarApp.getCalendarById(calId);
+  let lr = sheet.getLastRow()+1;
+  for(let i=2; i<lr; i++)
+  // Creating events in Shoot Details Calendar
+  {
+    let eventTitle = sheet.getRange(i,1).getValue() + " " + sheet.getRange(i,3).getValue();
+    var currentYear = new Date().getFullYear();
+    let date = sheet.getRange(i,2).getValue();
+    if(date.toString().indexOf(" - ")!=-1 && date != "" && date != "N/A" && date!="?"){
+      var startDate = sheet.getRange(i,2).getValue().toString().split(" - ")[0].trim();
+      var endDate = sheet.getRange(i,2).getValue().toString().split(" - ")[1].trim();
+      startDate = new Date(new Date(startDate).setFullYear(currentYear));
+      endDate = new Date(new Date(endDate).setFullYear(currentYear));
+      endDate = new Date(new Date(endDate).setHours(23,59)).getTime() + (24*60*60*1000);
+          endDate = new Date(endDate);
+      calender.createAllDayEvent(eventTitle,startDate,endDate);
+    }
+    else if(date.toString().indexOf("- ")!=-1 && date != "" && date != "N/A"&& date!="?"){
+      var eventDate = date.toString().split("- ")[1].trim();
+      eventDdate = new Date(new Date(eventDate).setFullYear(currentYear));
+      calender.createAllDayEvent(eventTitle,eventDate);
+    }
+    else if(date != "" && date != "N/A"&& date!="?"){
+      date = new Date(new Date(date).setFullYear(currentYear));
+      calender.createAllDayEvent(eventTitle,date);
+    }
+    Utilities.sleep(200);
+  }
+}
+
