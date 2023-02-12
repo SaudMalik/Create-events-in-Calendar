@@ -1,2 +1,2 @@
 # Create-events-in-Calendar
-Create events in Calendar from Google Sheets data using Google Apps Script
+This code creates a menu and add subitems to call functions and also create events in multiple Google Calendars from Google Sheets data using Google Apps Script
